@@ -1,4 +1,4 @@
 # GIS_SoSe
-## Kalender
-mit wöchentlichen Terminen 
-jährlichen Terminen 
+## Vorratsschrank
+Auflistung der Produkte im Schrank mit Anzahl 
+
