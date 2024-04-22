@@ -18,3 +18,20 @@ h1 {
     text-align: center;
     background-color: rgb(172, 161, 148);
 }
+h3 {
+    color: #4c3326;
+    font-family: 'Times New Roman', Times, serif;
+    text-align: unset;
+}
+
+    .container {
+        border: 1px solid #ccc;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    .item {
+        margin-bottom: 10px;
+    }
+    .add-item-form {
+        margin-top: 20px;
+    }
