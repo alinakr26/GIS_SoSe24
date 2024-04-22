@@ -3,20 +3,39 @@ h1 {
     font-family: 'Times New Roman', Times, serif;
     text-align: center;
 }
+
 .container {
     color: #4c3326;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-gap: 20px;
     font-family: 'Times New Roman', Times, serif;
-
+    border: 1px solid #ccc;
+    padding: 20px;
+    margin-bottom: 20px;
 }
-     
+
 .item {
     border: 3px solid #4c3326;
     padding: 10px;
     text-align: center;
     background-color: rgb(172, 161, 148);
+    margin-bottom: 10px;
+    position: relative;
+}
+.delete-icon {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    cursor: pointer;
+    color: #000;
+}
+
+
+.delete-icon::before {
+    content: '\1F5D1'; 
+    font-size: 20px;
+    color: #000000;
 }
 h3 {
     color: #4c3326;
@@ -24,14 +43,6 @@ h3 {
     text-align: unset;
 }
 
-    .container {
-        border: 1px solid #ccc;
-        padding: 20px;
-        margin-bottom: 20px;
-    }
-    .item {
-        margin-bottom: 10px;
-    }
-    .add-item-form {
-        margin-top: 20px;
-    }
+.add-item-form {
+    margin-top: 20px;
+}
