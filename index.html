@@ -4,7 +4,7 @@
   <link rel="stylesheet" href="styles.css">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=devi, initial-scale=1.0">
-    <title>Mein Vorratsschrank</title>
+    <title>Vorratsschrank</title>
 </head>
 <style>
     /* CSS für den Vorratsschrank */
@@ -22,20 +22,26 @@
 </style>
 </head>
 <body>
-<h1>Vorratsschrank</h1>
+<h1>Mein Vorratsschrank</h1>
 
 <div class="container">
     <div class="item">
-        <h2>Nudeln</h2>
+        <h3>Nudeln</h3>
         <p>Anzahl: <span id="nudelnCount">0</span></p>
         <button onclick="increaseCount('nudelnCount')">+</button>
         <button onclick="decreaseCount('nudelnCount')">-</button>
     </div>
     <div class="item">
-        <h2>Marmelade</h2>
+        <h3>Marmelade</h3>
         <p>Anzahl: <span id="MarmeladeCount">0</span></p>
         <button onclick="increaseCount('marmeladeCount')">+</button>
         <button onclick="decreaseCount('marmeladeCount')">-</button>
+    </div>
+    <div class="item">
+        <h3>Mehl</h3>
+        <p>Anzahl: <span id="MehlCount">0</span></p>
+        <button onclick="increaseCount('mehlCount')">+</button>
+        <button onclick="decreaseCount('mehlCount')">-</button>
     </div>
 </div>
 
@@ -44,51 +50,12 @@
 </div>
 
 <div class="add-item-form">
-    <h2>Neues Produkt hinzufügen</h2>
+    <h3>Neues Produkt hinzufügen</h3>
     <label for="newItemName">Produktname:</label>
     <input type="text" id="newItemName">
     <button onclick="addItem()">Hinzufügen</button>
 </div>
 
-<script>
-    // JavaScript für die Funktionalität
-    function increaseCount(id) {
-        var countElement = document.getElementById(id);
-        var count = parseInt(countElement.innerText);
-        countElement.innerText = count + 1;
-    }
-
-    function decreaseCount(id) {
-        var countElement = document.getElementById(id);
-        var count = parseInt(countElement.innerText);
-        if (count > 0) {
-            countElement.innerText = count - 1;
-        }
-    }
-
-    function addItem() {
-        var newItemName = document.getElementById('newItemName').value;
-        if (newItemName.trim() === '') {
-            alert('Bitte geben Sie einen Produktname ein.');
-            return;
-        }
-
-        var newItemContainer = document.createElement('div');
-        newItemContainer.classList.add('container');
-
-        var newItemContent = `
-            <div class="item">
-                <h2>${newItemName}</h2>
-                <p>Anzahl: <span id="${newItemName.toLowerCase()}Count">0</span></p>
-                <button onclick="increaseCount('${newItemName.toLowerCase()}Count')">Erhöhen</button>
-                <button onclick="decreaseCount('${newItemName.toLowerCase()}Count')">Verringern</button>
-            </div>
-        `;
-
-        newItemContainer.innerHTML = newItemContent;
-        document.body.insertBefore(newItemContainer, document.querySelector('.add-item-form'));
-    }
-</script>
 </body>
 </html>
   
