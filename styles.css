@@ -28,14 +28,13 @@ h1 {
     top: 5px;
     right: 5px;
     cursor: pointer;
-    color: #000;
 }
 
 
 .delete-icon::before {
     content: '\1F5D1'; 
     font-size: 20px;
-    color: #000000;
+    color: black;
 }
 h3 {
     color: #4c3326;
