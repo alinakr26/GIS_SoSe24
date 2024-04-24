@@ -23,6 +23,10 @@ h1 {
     margin-bottom: 10px;
     position: relative;
 }
+.warning {
+    background-color: rgb(239, 3, 50);
+
+}
 .delete-icon {
     position: absolute;
     top: 5px;
