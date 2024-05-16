@@ -36,10 +36,15 @@ function addItem() {
   }
   
   // Funktion zum Löschen des Lebensmittels
-  function deleteItem(deleteIcon) {
-    var item = deleteIcon.parentElement;
-    item.remove();
-  }
+  function deleteItem(event) {
+    var item = event.target.parentElement;
+    if (item) {
+        item.remove();
+    }
+}
+
+  
+
   
   // Funktion zum Überprüfen der Anzahl und Färben der Container und Schrift
   function checkCountAndColor(countSpan, count) {
@@ -120,3 +125,6 @@ function checkCountAndColor(countSpan, count) {
       countSpan.parentElement.parentElement.classList.remove("warning"); // Container rot färben entfernen
   }
 }
+document.addEventListener("DOMContentLoaded", function() {
+  // Hier kommt dein JavaScript-Code hin
+});
