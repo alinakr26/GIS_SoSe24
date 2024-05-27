@@ -1,66 +1,85 @@
-/* Farbvariablen */
-:root {
-    --primary-color: rgb(2, 105, 139);
-    --secondary-color: #4c3326;
-    --warning-color: rgb(239, 3, 50);
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: 'Times New Roman', Times, serif;
   }
   
-  /* Überschrift */
   h1 {
-      color: var(--primary-color);
-      font-family: 'Times New Roman', Times, serif;
-      text-align: center;
+    color: rgb(2, 105, 139);
+    margin: 20px 0; /* Adjusted margin to bring it higher */
   }
   
-  /* Hauptcontainer */
   .container {
-      color: var(--secondary-color);
-      display: flex;
-      flex-direction: column;
-      font-family: 'Times New Roman', Times, serif;
-      border: 1px solid #ccc;
-      padding: 20px;
-      margin: 0 auto; 
+    display: flex;
+    flex-direction: column;
+    height: 90vh; /* Reduced height */
+    width: 95vw; /* Reduced width */
+    overflow-y: auto;
+    border: 1px solid #5c5c5c;
+    padding: 10px;
+    box-sizing: border-box;
   }
   
-  /* Lebensmittelebene */
+  .levels {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow-y: auto;
+  }
+  
   .level {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      border-bottom: 5px solid var(--secondary-color); /* Dicker brauner Balken oben */
-      padding-top: 5px; /* Abstand zum Balken */
-      align-items: center; /* Vertikale Ausrichtung zentrieren */
+    display: flex;
+    flex-wrap: wrap;
+    border-bottom: 5px solid #a1826fa8;
+    padding-top: 5px;
   }
   
-  /* Einzelnes Lebensmittel */
   .item {
-      flex: 0 0 calc(25% - 20px); /* Breite für jedes Element */
-      margin: 0.5rem; /* Platz um die Produkte herum */
-      border: 3px solid var(--secondary-color);
-      padding: 10px;
-      text-align: center;
-      background-color: rgb(172, 161, 148);
-      position: relative;
+    flex: 0 0 calc(20% - 10px); /* Further reduced width */
+    margin: 5px; /* Reduced margin */
+    border: 3px solid #4c3326;
+    padding: 5px; /* Reduced padding */
+    text-align: center;
+    background-color: rgb(172, 161, 148);
+    position: relative;
   }
   
-  /* Warnungsklasse */
   .warning {
-      background-color: var(--warning-color);
-  }
-  
-  /* Überschrift für jedes Lebensmittel */
-  h3 {
-      color: var(--secondary-color);
-      font-family: 'Times New Roman', Times, serif;
-      text-align: unset;
-  }
-  
-  /* Eingabeformular */
-  .add-item-form {
-      margin-top: 20px;
-  }
-  
+    background-color: rgb(243, 40, 40);
 
+  }
   
+  .delete-icon {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    cursor: pointer;
+  }
+  
+  h3 {
+    color: #414040;
+    text-align: unset;
+  }
+  
+  .add-item-form {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+    padding: 10px;
+    border: 2px solid rgb(2, 105, 139);
+    background-color: rgb(159, 191, 202);
+    border-radius: 5px;
+  }
+  
+  .add-item-form label,
+  .add-item-form input,
+  .add-item-form select,
+  .add-item-form button {
+    margin: 5px 10px;
+  }
   

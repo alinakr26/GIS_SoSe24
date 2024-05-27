@@ -64,6 +64,10 @@ function addItemToPage(item) {
       <button onclick="deleteItem('${item.name.replace(/\s/g, '')}')">Löschen</button>
   `;
 
+  if (item.amount < 2) {
+    newItem.classList.add("warning");
+  }
+
   var levelContainer = document.getElementById(`level${item.level}`);
   if (levelContainer) {
       levelContainer.appendChild(newItem);
@@ -84,9 +88,9 @@ function decreaseCount(itemName) {
   var countSpan = document.getElementById(`${itemName}Count`);
   var count = parseInt(countSpan.textContent);
   if (count > 0) {
-    countSpan.textContent = count - 1;
-    updateItemInLocalStorage(itemName, count - 1);
-    checkCountAndColor(countSpan, count - 1);
+      countSpan.textContent = count - 1;
+      updateItemInLocalStorage(itemName, count - 1);
+      checkCountAndColor(countSpan, count - 1);
   }
 }
 
@@ -97,10 +101,10 @@ function deleteItem(itemName) {
 }
 
 function checkCountAndColor(countSpan, count) {
-  if (count <= 1) {
-    countSpan.parentElement.parentElement.classList.add("warning");
+  if (count < 2) {
+      countSpan.parentElement.parentElement.classList.add("warning");
   } else {
-    countSpan.parentElement.parentElement.classList.remove("warning");
+      countSpan.parentElement.parentElement.classList.remove("warning");
   }
 }
 

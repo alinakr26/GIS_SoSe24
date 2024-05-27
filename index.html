@@ -1,15 +1,13 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link rel="stylesheet" href="styles.css"> 
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Vorratsschrank</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <h1>Mein Vorratsschrank</h1>
-  
   <div class="container">
     <!-- Eingabeformular für neue Lebensmittel -->
     <div class="add-item-form">
@@ -26,15 +24,18 @@
       </select>
       <button onclick="addItem()">Hinzufügen</button>
     </div>
-  </div>
 
-  <!-- Lebensmittelbehälter für jede Ebene -->
-  <div class="level" id="level1"></div>
-  <div class="level" id="level2"></div>
-  <div class="level" id="level3"></div>
-  <div class="level" id="level4"></div>
+    <!-- Lebensmittelbehälter für jede Ebene -->
+    <div class="levels">
+      <div class="level" id="level1"></div>
+      <div class="level" id="level2"></div>
+      <div class="level" id="level3"></div>
+      <div class="level" id="level4"></div>
+    </div>
+  </div>
 
   <!-- JavaScript-Datei einbinden -->
   <script src="script.js" defer></script>
 </body>
 </html>
+
