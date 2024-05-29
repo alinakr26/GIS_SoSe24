@@ -103,6 +103,7 @@ function deleteItem(itemName) {
 function checkCountAndColor(countSpan, count) {
   if (count < 2) {
       countSpan.parentElement.parentElement.classList.add("warning");
+
   } else {
       countSpan.parentElement.parentElement.classList.remove("warning");
   }

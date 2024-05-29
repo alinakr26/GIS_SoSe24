@@ -52,6 +52,10 @@ body, html {
   .warning {
     background-color: rgb(243, 40, 40);
   }
+
+  .warning h3 {
+    color: black;
+  }
   
   .delete-icon {
     position: absolute;
