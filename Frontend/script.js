@@ -2,8 +2,11 @@ document.addEventListener("DOMContentLoaded", function () {
   loadItemsFromLocalStorage();
 });
 
-function loadItemsFromLocalStorage() {
-  var items = localStorage.getItem("items");
+async function loadItemsFromLocalStorage() {
+ // var items = localSt.getItem("items");
+ const response = await fetch("http://127.0.0.1:3000/api/items");
+  const items = await response.text();
+  console.log(items)
   if (items) {
       items = JSON.parse(items);
       items.forEach(function (item) {
@@ -24,7 +27,7 @@ function formatDate(dateString) {
   return `${day < 10 ? '0' + day : day}.${month < 10 ? '0' + month : month}.${year}`;
 }
 
-function addItem() {
+async function addItem() {
   var newItemName = document.getElementById("newItemName").value.trim();
   var newItemDate = document.getElementById("newItemDate").value;
   var level = document.getElementById("levelSelect").value;
@@ -43,9 +46,11 @@ function addItem() {
 
   addItemToPage(newItem);
 
-  var items = localStorage.getItem("items") ? JSON.parse(localStorage.getItem("items")) : [];
-  items.push(newItem);
-  saveItemsToLocalStorage(items);
+
+  const response = await fetch("http://127.0.0.1:3000/api/items", {
+    method: 'post',
+    body: JSON.stringify(newItem),
+  });
 
   document.getElementById("newItemName").value = "";
   document.getElementById("newItemDate").value = "";
@@ -119,5 +124,38 @@ function updateItemInLocalStorage(itemName, newCount) {
 function removeItemFromLocalStorage(itemName) {
   var items = JSON.parse(localStorage.getItem("items"));
   items = items.filter(item => item.name.replace(/\s/g, '') !== itemName);
+  saveItemsToLocalStorage(items);
+}
+function increaseCount(itemName) {
+  var countSpan = document.getElementById(`${itemName}Count`);
+  var count = parseInt(countSpan.textContent);
+  countSpan.textContent = count + 1;
+  updateItemInLocalStorage(itemName, count + 1);
+  checkCountAndColor(countSpan, count + 1);
+}
+
+function decreaseCount(itemName) {
+  var countSpan = document.getElementById(`${itemName}Count`);
+  var count = parseInt(countSpan.textContent);
+  if (count > 0) {
+      countSpan.textContent = count - 1;
+      updateItemInLocalStorage(itemName, count - 1);
+      checkCountAndColor(countSpan, count - 1);
+  }
+}
+
+async function deleteItem(itemName) {
+  const response = await fetch("http://127.0.0.1:3000/api/items");
+  console.log('Response', response); 
+  const text = await response.text();
+  console.log(text); // Text aus Response Body
+  var itemElement = document.getElementById(`${itemName}Count`).parentElement.parentElement;
+  var items = JSON.parse(localStorage.getItem("items"));
+  var item = items.find(i => i.name.replace(/\s/g, '') === itemName);
+  if (item) {
+    deleteItemFromServer(item.id);
+  }
+  itemElement.remove();
+  items = items.filter(i => i.name.replace(/\s/g, '') !== itemName);
   saveItemsToLocalStorage(items);
 }
