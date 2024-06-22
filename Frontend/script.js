@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", function () {
 async function loadItemsFromLocalStorage() {
  // var items = localSt.getItem("items");
  const response = await fetch("http://127.0.0.1:3000/api/items");
-  const items = await response.text();
+  let items = await response.text();
   console.log(items)
   if (items) {
       items = JSON.parse(items);

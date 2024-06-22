@@ -3,6 +3,8 @@ const url = require('url');
 const { v4: uuidv4 } = require('uuid');
 const sqlite3 = require('sqlite3');
 const sqlite = require('sqlite');
+response.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE');
+response.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
 
 const hostname = '127.0.0.1'; // localhost
@@ -60,7 +62,7 @@ const server = http.createServer(async (request, response) => {
     });
   } else if (method === 'DELETE' && path.startsWith('/api/items/')) {
     const id = path.split('/')[3];
-    const index = items.findIndex(item => item.id === id);
+    let index = items.findIndex(item => item.id === id);
     if (index !== -1) {
       const deletedItem = items.splice(index, 1);
       response.writeHead(200, { 'Content-Type': 'application/json' });
@@ -73,8 +75,8 @@ const server = http.createServer(async (request, response) => {
     response.writeHead(404, { 'Content-Type': 'application/json' });
     response.end(JSON.stringify({ message: 'Route not found' }));
   }
-});
 
+});
 server.listen(port, hostname, () => {
   console.log(`Server running at http://${hostname}:${port}/`);
 });
