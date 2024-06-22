@@ -3,8 +3,7 @@ const url = require('url');
 const { v4: uuidv4 } = require('uuid');
 const sqlite3 = require('sqlite3');
 const sqlite = require('sqlite');
-response.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE');
-response.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
 
 
 const hostname = '127.0.0.1'; // localhost
@@ -18,7 +17,8 @@ const server = http.createServer(async (request, response) => {
   const method = request.method;
   const path = parsedUrl.pathname;
   response.setHeader('Access-Control-Allow-Origin', '*'); // on CORS error /
-  
+  response.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE');
+  response.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     const dbFilePath = 'myDatabase.db';
     const db = await sqlite.open({
       filename: dbFilePath,
