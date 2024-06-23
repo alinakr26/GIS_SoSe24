@@ -5,6 +5,9 @@ document.addEventListener("DOMContentLoaded", function () {
 async function loadItemsFromServer() {
   try {
     const response = await fetch("http://127.0.0.1:3000/api/items");
+    if (!response.ok) {
+      throw new Error('Error loading items from server');
+    }
     const items = await response.json();
     console.log(items);
     items.forEach(function (item) {
@@ -15,25 +18,46 @@ async function loadItemsFromServer() {
   }
 }
 
-async function saveItemsToServer(items) {
-  for (let item of items) {
-    try {
-      const response = await fetch("http://127.0.0.1:3000/api/items", {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(item)
-      });
+async function saveItemsToServer(item) {
+  try {
+    const response = await fetch("http://127.0.0.1:3000/api/items", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(item)
+    });
 
-      if (!response.ok) {
-        throw new Error('Error saving item to server');
-      }
-
-      console.log(`Item ${item.name} successfully saved to server`);
-    } catch (error) {
-      console.error(`Error saving item ${item.name} to server:`, error);
+    if (!response.ok) {
+      throw new Error('Error saving item to server');
     }
+
+    console.log(`Item ${item.name} successfully saved to server`);
+  } catch (error) {
+    console.error(`Error saving item ${item.name} to server:`, error);
+  }
+}
+
+
+
+async function deleteItem(itemName) {
+  try {
+    const response = await fetch(`http://127.0.0.1:3000/api/items/${itemName}`, {
+      method: 'DELETE'
+    });
+
+    if (!response.ok) {
+      throw new Error('Error deleting item from server');
+    }
+
+    console.log(`Item ${itemName} successfully deleted from server`);
+
+    var itemElement = document.querySelector(`[data-name="${itemName}"]`);
+    if (itemElement) {
+      itemElement.remove();
+    }
+  } catch (error) {
+    console.error("Error deleting item from server:", error);
   }
 }
 
@@ -65,22 +89,11 @@ async function addItem() {
   addItemToPage(newItem);
 
   try {
-    const response = await fetch("http://127.0.0.1:3000/api/items", {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(newItem)
-    });
-
-    if (!response.ok) {
-      throw new Error('Error saving new item to server');
-    }
-  } catch (error) {
-    console.error('Error:', error);
-  } finally {
+    await saveItemsToServer(newItem);
     document.getElementById("newItemName").value = "";
     document.getElementById("newItemDate").value = "";
+  } catch (error) {
+    console.error('Error:', error);
   }
 }
 
@@ -127,28 +140,7 @@ async function decreaseCount(itemName) {
     checkCountAndColor(countSpan, count - 1);
   }
 }
-
-async function deleteItem(itemName) {
-  try {
-    const response = await fetch(`http://127.0.0.1:3000/api/items/${itemName}`, {
-      method: 'DELETE'
-    });
-
-    if (!response.ok) {
-      throw new Error('Error deleting item from server');
-    }
-
-    console.log(`Item ${itemName} successfully deleted from server`);
-
-    var itemElement = document.querySelector(`[data-name="${itemName}"]`);
-    if (itemElement) {
-      itemElement.remove();
-    }
-  } catch (error) {
-    console.error("Error deleting item from server:", error);
-  }
-}
-
+  
 function checkCountAndColor(countSpan, count) {
   if (count < 2) {
     countSpan.parentElement.parentElement.classList.add("warning");
@@ -176,4 +168,3 @@ async function updateItemOnServer(itemName, newCount) {
     console.error("Error updating item on server:", error);
   }
 }
-
