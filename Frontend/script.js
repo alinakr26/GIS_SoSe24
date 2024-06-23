@@ -1,22 +1,40 @@
 document.addEventListener("DOMContentLoaded", function () {
-  loadItemsFromLocalStorage();
+  loadItemsFromServer();
 });
 
-async function loadItemsFromLocalStorage() {
- // var items = localSt.getItem("items");
- const response = await fetch("http://127.0.0.1:3000/api/items");
-  let items = await response.text();
-  console.log(items)
-  if (items) {
-      items = JSON.parse(items);
-      items.forEach(function (item) {
-          addItemToPage(item);
-      });
+async function loadItemsFromServer() {
+  try {
+    const response = await fetch("http://127.0.0.1:3000/api/items");
+    const items = await response.json();
+    console.log(items);
+    items.forEach(function (item) {
+      addItemToPage(item);
+    });
+  } catch (error) {
+    console.error("Error loading items from server:", error);
   }
 }
 
-function saveItemsToLocalStorage(items) {
-  localStorage.setItem("items", JSON.stringify(items));
+async function saveItemsToServer(items) {
+  for (let item of items) {
+    try {
+      const response = await fetch("http://127.0.0.1:3000/api/items", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(item)
+      });
+
+      if (!response.ok) {
+        throw new Error('Error saving item to server');
+      }
+
+      console.log(`Item ${item.name} successfully saved to server`);
+    } catch (error) {
+      console.error(`Error saving item ${item.name} to server:`, error);
+    }
+  }
 }
 
 function formatDate(dateString) {
@@ -33,40 +51,51 @@ async function addItem() {
   var level = document.getElementById("levelSelect").value;
 
   if (newItemName === "" || newItemDate === "") {
-      alert("Bitte geben Sie den Namen und das Ablaufdatum des Lebensmittels ein.");
-      return;
+    alert("Bitte geben Sie den Namen und das Ablaufdatum des Lebensmittels ein.");
+    return;
   }
 
   var newItem = {
-      name: newItemName,
-      amount: 0,
-      date: newItemDate,
-      level: level
+    name: newItemName,
+    amount: 0,
+    date: newItemDate,
+    level: level
   };
 
   addItemToPage(newItem);
 
+  try {
+    const response = await fetch("http://127.0.0.1:3000/api/items", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(newItem)
+    });
 
-  const response = await fetch("http://127.0.0.1:3000/api/items", {
-    method: 'post',
-    body: JSON.stringify(newItem),
-  });
-
-  document.getElementById("newItemName").value = "";
-  document.getElementById("newItemDate").value = "";
+    if (!response.ok) {
+      throw new Error('Error saving new item to server');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+  } finally {
+    document.getElementById("newItemName").value = "";
+    document.getElementById("newItemDate").value = "";
+  }
 }
 
 function addItemToPage(item) {
   var newItem = document.createElement("div");
   newItem.classList.add("item");
+  newItem.setAttribute("data-name", item.name.replace(/\s/g, ''));
   const formattedDate = formatDate(item.date);
   newItem.innerHTML = `
-      <h3>${item.name}</h3>
-      <p>Anzahl: <span id="${item.name.replace(/\s/g, '')}Count" class="count">${item.amount}</span></p>
-      <p>Ablaufdatum: <span class="expiry-date">${formattedDate}</span></p>
-      <button onclick="increaseCount('${item.name.replace(/\s/g, '')}')">+</button>
-      <button onclick="decreaseCount('${item.name.replace(/\s/g, '')}')">-</button>
-      <button onclick="deleteItem('${item.name.replace(/\s/g, '')}')">Löschen</button>
+    <h3>${item.name}</h3>
+    <p>Anzahl: <span id="${item.name.replace(/\s/g, '')}Count" class="count">${item.amount}</span></p>
+    <p>Ablaufdatum: <span class="expiry-date">${formattedDate}</span></p>
+    <button onclick="increaseCount('${item.name.replace(/\s/g, '')}')">+</button>
+    <button onclick="decreaseCount('${item.name.replace(/\s/g, '')}')">-</button>
+    <button onclick="deleteItem('${item.name.replace(/\s/g, '')}')">Löschen</button>
   `;
 
   if (item.amount < 2) {
@@ -75,87 +104,76 @@ function addItemToPage(item) {
 
   var levelContainer = document.getElementById(`level${item.level}`);
   if (levelContainer) {
-      levelContainer.appendChild(newItem);
+    levelContainer.appendChild(newItem);
   } else {
-      console.error(`Level ${item.level} container not found.`);
+    console.error(`Level ${item.level} container not found.`);
   }
 }
 
-function increaseCount(itemName) {
+async function increaseCount(itemName) {
   var countSpan = document.getElementById(`${itemName}Count`);
   var count = parseInt(countSpan.textContent);
   countSpan.textContent = count + 1;
-  updateItemInLocalStorage(itemName, count + 1);
+  await updateItemOnServer(itemName, count + 1);
   checkCountAndColor(countSpan, count + 1);
 }
 
-function decreaseCount(itemName) {
+async function decreaseCount(itemName) {
   var countSpan = document.getElementById(`${itemName}Count`);
   var count = parseInt(countSpan.textContent);
   if (count > 0) {
-      countSpan.textContent = count - 1;
-      updateItemInLocalStorage(itemName, count - 1);
-      checkCountAndColor(countSpan, count - 1);
-  }
-}
-
-function deleteItem(itemName) {
-  var item = document.getElementById(`${itemName}Count`).parentElement.parentElement;
-  item.remove();
-  removeItemFromLocalStorage(itemName);
-}
-
-function checkCountAndColor(countSpan, count) {
-  if (count < 2) {
-      countSpan.parentElement.parentElement.classList.add("warning");
-
-  } else {
-      countSpan.parentElement.parentElement.classList.remove("warning");
-  }
-}
-
-function updateItemInLocalStorage(itemName, newCount) {
-  var items = JSON.parse(localStorage.getItem("items"));
-  var item = items.find(item => item.name.replace(/\s/g, '') === itemName);
-  item.amount = newCount;
-  saveItemsToLocalStorage(items);
-}
-
-function removeItemFromLocalStorage(itemName) {
-  var items = JSON.parse(localStorage.getItem("items"));
-  items = items.filter(item => item.name.replace(/\s/g, '') !== itemName);
-  saveItemsToLocalStorage(items);
-}
-function increaseCount(itemName) {
-  var countSpan = document.getElementById(`${itemName}Count`);
-  var count = parseInt(countSpan.textContent);
-  countSpan.textContent = count + 1;
-  updateItemInLocalStorage(itemName, count + 1);
-  checkCountAndColor(countSpan, count + 1);
-}
-
-function decreaseCount(itemName) {
-  var countSpan = document.getElementById(`${itemName}Count`);
-  var count = parseInt(countSpan.textContent);
-  if (count > 0) {
-      countSpan.textContent = count - 1;
-      updateItemInLocalStorage(itemName, count - 1);
-      checkCountAndColor(countSpan, count - 1);
+    countSpan.textContent = count - 1;
+    await updateItemOnServer(itemName, count - 1);
+    checkCountAndColor(countSpan, count - 1);
   }
 }
 
 async function deleteItem(itemName) {
-  const response = await fetch("http://127.0.0.1:3000/api/items");
-  console.log('Response', response); 
-  const text = await response.text();
-  console.log(text); // Text aus Response Body
-  var itemElement = document.getElementById(`${itemName}Count`).parentElement.parentElement;
-  var items = JSON.parse(localStorage.getItem("items"));
-  var item = items.find(i => i.name.replace(/\s/g, '') === itemName);
-  if (item) {
-    deleteItemFromServer(item.id);
+  try {
+    const response = await fetch(`http://127.0.0.1:3000/api/items/${itemName}`, {
+      method: 'DELETE'
+    });
+
+    if (!response.ok) {
+      throw new Error('Error deleting item from server');
+    }
+
+    console.log(`Item ${itemName} successfully deleted from server`);
+
+    var itemElement = document.querySelector(`[data-name="${itemName}"]`);
+    if (itemElement) {
+      itemElement.remove();
+    }
+  } catch (error) {
+    console.error("Error deleting item from server:", error);
   }
-  itemElement.remove();
-  items = items.filter(i => i.name.replace(/\s/g, '') !== itemName);
-  saveItemsToLocalStorage(items);
 }
+
+function checkCountAndColor(countSpan, count) {
+  if (count < 2) {
+    countSpan.parentElement.parentElement.classList.add("warning");
+  } else {
+    countSpan.parentElement.parentElement.classList.remove("warning");
+  }
+}
+
+async function updateItemOnServer(itemName, newCount) {
+  try {
+    const response = await fetch(`http://127.0.0.1:3000/api/items/${itemName}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ amount: newCount })
+    });
+
+    if (!response.ok) {
+      throw new Error('Error updating item on server');
+    }
+
+    console.log(`Item ${itemName} successfully updated on server`);
+  } catch (error) {
+    console.error("Error updating item on server:", error);
+  }
+}
+
