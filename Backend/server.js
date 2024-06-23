@@ -5,7 +5,7 @@ const sqlite3 = require('sqlite3').verbose();
 const sqlite = require('sqlite');
 
 const hostname = '127.0.0.1'; // localhost
-const port = 3000;
+const port = 4000;
 
 let db;
 
@@ -93,5 +93,3 @@ initDb().then(() => {
 }).catch((error) => {
   console.error('Failed to initialize the database:', error);
 });
-
-  

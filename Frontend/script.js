@@ -4,154 +4,145 @@ document.addEventListener("DOMContentLoaded", function () {
 
 async function loadItemsFromServer() {
   try {
-    const response = await fetch("http://127.0.0.1:3000/api/items");
+    const response = await fetch("http://127.0.0.1:4000/api/items");
     if (!response.ok) {
-      throw new Error('Error loading items from server');
+      throw new Error(`Serverantwort nicht OK: ${response.status} ${response.statusText}`);
     }
     const items = await response.json();
-    console.log(items);
-    items.forEach(function (item) {
-      addItemToPage(item);
+    items.forEach(item => {
+      if (item && item.id && item.name && item.date && typeof item.level === 'string') {
+        addItemToPage(item);
+      } else {
+        console.error(`Ungültiges Element erhalten: ${JSON.stringify(item)}`);
+      }
     });
   } catch (error) {
-    console.error("Error loading items from server:", error);
+    console.error("Fehler beim Laden der Elemente vom Server:", error);
   }
-}
-
-async function saveItemsToServer(item) {
-  try {
-    const response = await fetch("http://127.0.0.1:3000/api/items", {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(item)
-    });
-
-    if (!response.ok) {
-      throw new Error('Error saving item to server');
-    }
-
-    console.log(`Item ${item.name} successfully saved to server`);
-  } catch (error) {
-    console.error(`Error saving item ${item.name} to server:`, error);
-  }
-}
-
-
-try{
-async function deleteItem(itemName) {
-    const response = await fetch(`http://127.0.0.1:3000/api/items/${itemName}`, {
-      method: 'DELETE'
-    });
-
-    if (!response.ok) {
-      throw new Error('Error deleting item from server');
-    }
-
-    console.log(`Item ${itemName} successfully deleted from server`);
-
-    var itemElement = document.querySelector(`[data-name="${itemName}"]`);
-    if (itemElement) {
-      itemElement.remove();
-    }
-  }
-}
-
-
-catch{
-function formatDate(dateString) {
-  const date = new Date(dateString);
-  const day = date.getDate();
-  const month = date.getMonth() + 1;
-  const year = date.getFullYear();
-  return `${day < 10 ? '0' + day : day}.${month < 10 ? '0' + month : month}.${year}`;
-}
 }
 
 async function addItem() {
-  var newItemName = document.getElementById("newItemName").value.trim();
-  var newItemDate = document.getElementById("newItemDate").value;
-  var level = document.getElementById("levelSelect").value;
+  const newItemName = document.getElementById("newItemName").value.trim();
+  const newItemDate = document.getElementById("newItemDate").value;
+  const level = document.getElementById("levelSelect").value;
 
-  if (newItemName === "" || newItemDate === "") {
+  if (!newItemName || !newItemDate) {
     alert("Bitte geben Sie den Namen und das Ablaufdatum des Lebensmittels ein.");
     return;
   }
 
-  var newItem = {
+  const newItem = {
     name: newItemName,
     amount: 0,
     date: newItemDate,
     level: level
   };
 
-  addItemToPage(newItem);
-
   try {
-    await saveItemsToServer(newItem);
-    document.getElementById("newItemName").value = "";
-    document.getElementById("newItemDate").value = "";
+    const response = await fetch("http://127.0.0.1:4000/api/items", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(newItem)
+    });
+
+    if (response.ok) {
+      const savedItem = await response.json();
+      addItemToPage(savedItem);
+      console.log(`Lebensmittel "${savedItem.name}" erfolgreich hinzugefügt`);
+    } else {
+      console.error(`Fehler beim Hinzufügen des Lebensmittels: ${response.statusText}`);
+    }
   } catch (error) {
-    console.error('Error:', error);
+    console.error("Fehler beim Hinzufügen des Lebensmittels:", error);
   }
-}
 
+  document.getElementById("newItemName").value = "";
+  document.getElementById("newItemDate").value = "";
+}
 function addItemToPage(item) {
-  var newItem = document.createElement("div");
-  newItem.classList.add("item");
-  newItem.setAttribute("data-name", item.name.replace(/\s/g, ''));
-  const formattedDate = formatDate(item.date);
-  newItem.innerHTML = `
-    <h3>${item.name}</h3>
-    <p>Anzahl: <span id="${item.name.replace(/\s/g, '')}Count" class="count">${item.amount}</span></p>
-    <p>Ablaufdatum: <span class="expiry-date">${formattedDate}</span></p>
-    <button onclick="increaseCount('${item.name.replace(/\s/g, '')}')">+</button>
-    <button onclick="decreaseCount('${item.name.replace(/\s/g, '')}')">-</button>
-    <button onclick="deleteItem('${item.name.replace(/\s/g, '')}')">Löschen</button>
-  `;
-
-  if (item.amount < 2) {
-    newItem.classList.add("warning");
+  if (!item || typeof item.id !== 'string' || typeof item.name !== 'string' || typeof item.amount !== 'number' || !item.date || typeof item.level !== 'string') {
+    console.error(`Ungültiges Element: ${JSON.stringify(item)}`);
+    return;
   }
 
-  var levelContainer = document.getElementById(`level${item.level}`);
+
+  const listItem = document.createElement("div");
+  listItem.className = "item";
+  listItem.textContent = item.name;
+
+  const countWrapper = document.createElement("div");
+  countWrapper.className = "count-wrapper";
+
+  const countSpan = document.createElement("span");
+  countSpan.className = "count";
+  countSpan.textContent = item.amount;
+  countWrapper.appendChild(countSpan);
+
+  const minusButton = document.createElement("button");
+  minusButton.textContent = "-";
+  minusButton.addEventListener("click", function () {
+    updateItemCount(item, countSpan, -1);
+  });
+  countWrapper.appendChild(minusButton);
+
+  const plusButton = document.createElement("button");
+  plusButton.textContent = "+";
+  plusButton.addEventListener("click", function () {
+    updateItemCount(item, countSpan, 1);
+  });
+  countWrapper.appendChild(plusButton);
+
+  listItem.appendChild(countWrapper);
+
+  const dateSpan = document.createElement("span");
+  dateSpan.className = "date";
+  dateSpan.textContent = formatDate(item.date);
+  listItem.appendChild(dateSpan);
+
+  const deleteButton = document.createElement("button");
+  deleteButton.textContent = "X";
+  deleteButton.addEventListener("click", function () {
+    deleteItem(item, listItem);
+  });
+  listItem.appendChild(deleteButton);
+
+  const levelContainer = document.getElementById(`level${item.level}`);
   if (levelContainer) {
-    levelContainer.appendChild(newItem);
+    levelContainer.appendChild(listItem);
   } else {
-    console.error(`Level ${item.level} container not found.`);
+    console.error(`Container für Ebene ${item.level} nicht gefunden. Element "${item.name}" konnte nicht hinzugefügt werden.`);
   }
 }
 
-async function increaseCount(itemName) {
-  var countSpan = document.getElementById(`${itemName}Count`);
-  var count = parseInt(countSpan.textContent);
-  countSpan.textContent = count + 1;
-  await updateItemOnServer(itemName, count + 1);
-  checkCountAndColor(countSpan, count + 1);
+async function updateItemCount(item, countSpan, change) {
+  const newCount = Math.max(0, parseInt(countSpan.textContent) + change);
+  countSpan.textContent = newCount;
+  await updateItemOnServer(item.id, newCount);
+  checkCountAndColor(countSpan, newCount);
 }
 
-async function decreaseCount(itemName) {
-  var countSpan = document.getElementById(`${itemName}Count`);
-  var count = parseInt(countSpan.textContent);
-  if (count > 0) {
-    countSpan.textContent = count - 1;
-    await updateItemOnServer(itemName, count - 1);
-    checkCountAndColor(countSpan, count - 1);
-  }
-}
-  
-function checkCountAndColor(countSpan, count) {
-  if (count < 2) {
-    countSpan.parentElement.parentElement.classList.add("warning");
-  } else {
-    countSpan.parentElement.parentElement.classList.remove("warning");
-  }
-}
-
-async function updateItemOnServer(itemName, newCount) {
+async function deleteItem(item, listItem) {
   try {
-    const response = await fetch(`http://127.0.0.1:3000/api/items/${itemName}`, {
+    const response = await fetch(`http://127.0.0.1:4000/api/items/${item.id}`, {
+      method: 'DELETE'
+    });
+
+    if (response.ok) {
+      listItem.remove();
+      console.log(`Element ${item.id} erfolgreich vom Server gelöscht`);
+    } else {
+      throw new Error('Fehler beim Löschen des Elements vom Server');
+    }
+  } catch (error) {
+    console.error(`Fehler beim Löschen des Elements ${item.id} vom Server:`, error);
+  }
+}
+
+async function updateItemOnServer(itemId, newCount) {
+  try {
+    const response = await fetch(`http://127.0.0.1:4000/api/items/${itemId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
@@ -160,10 +151,25 @@ async function updateItemOnServer(itemName, newCount) {
     });
 
     if (!response.ok) {
-      throw new Error('Error updating item on server');
+      throw new Error('Fehler beim Aktualisieren des Elements auf dem Server');
     }
 
-    console.log(`Item ${itemName} successfully updated on server`);
-  }finally {
+    console.log(`Element ${itemId} erfolgreich auf dem Server aktualisiert`);
+  } catch (error) {
+    console.error(`Fehler beim Aktualisieren des Elements ${itemId} auf dem Server:`, error);
+  }
+}
 
-  }} 
+function formatDate(dateString) {
+  const date = new Date(dateString);
+  return `${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1).toString().padStart(2, '0')}.${date.getFullYear()}`;
+}
+
+function checkCountAndColor(countSpan, count) {
+  const itemElement = countSpan.closest(".item");
+  if (count < 2) {
+    itemElement.classList.add("warning");
+  } else {
+    itemElement.classList.remove("warning");
+  }
+}
