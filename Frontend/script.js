@@ -39,9 +39,8 @@ async function saveItemsToServer(item) {
 }
 
 
-
+try{
 async function deleteItem(itemName) {
-  try {
     const response = await fetch(`http://127.0.0.1:3000/api/items/${itemName}`, {
       method: 'DELETE'
     });
@@ -56,17 +55,18 @@ async function deleteItem(itemName) {
     if (itemElement) {
       itemElement.remove();
     }
-  } catch (error) {
-    console.error("Error deleting item from server:", error);
   }
 }
 
+
+catch{
 function formatDate(dateString) {
   const date = new Date(dateString);
   const day = date.getDate();
   const month = date.getMonth() + 1;
   const year = date.getFullYear();
   return `${day < 10 ? '0' + day : day}.${month < 10 ? '0' + month : month}.${year}`;
+}
 }
 
 async function addItem() {
@@ -164,7 +164,6 @@ async function updateItemOnServer(itemName, newCount) {
     }
 
     console.log(`Item ${itemName} successfully updated on server`);
-  } catch (error) {
-    console.error("Error updating item on server:", error);
-  }
-}
+  }finally {
+
+  }} 
