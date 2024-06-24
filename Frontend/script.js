@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 async function loadItemsFromServer() {
   try {
-    const response = await fetch("http://127.0.0.1:4000/api/items");
+    const response = await fetch("http://127.0.0.1:4000/items");//
     if (!response.ok) {
       throw new Error(`Serverantwort nicht OK: ${response.status} ${response.statusText}`);
     }
@@ -39,7 +39,7 @@ async function addItem() {
   };
 
   try {
-    const response = await fetch("http://127.0.0.1:4000/api/items", {
+    const response = await fetch("http://127.0.0.1:4000/items", {  //
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -125,7 +125,7 @@ async function updateItemCount(item, countSpan, change) {
 
 async function deleteItem(item, listItem) {
   try {
-    const response = await fetch(`http://127.0.0.1:4000/api/items/${item.id}`, {
+    const response = await fetch(`http://127.0.0.1:4000/items/${item.id}`, {//
       method: 'DELETE'
     });
 
@@ -142,7 +142,7 @@ async function deleteItem(item, listItem) {
 
 async function updateItemOnServer(itemId, newCount) {
   try {
-    const response = await fetch(`http://127.0.0.1:4000/api/items/${itemId}`, {
+    const response = await fetch(`http://127.0.0.1:4000/items/${itemId}`, { //
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'

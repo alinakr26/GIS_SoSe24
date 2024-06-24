@@ -28,13 +28,12 @@ const server = http.createServer(async (request, response) => {
   response.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   response.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
-  if (method === 'OPTIONS') {
-    response.writeHead(204);
-    response.end();
-    return;
-  }
+ if (method === 'OPTIONS') {
+  response.end();
+  return;
+ }
 
-  if (method === 'POST' && path === '/api/items') {
+  if (method === 'POST' && path === '/items') { //
     let jsonString = '';
     request.on('data', (data) => {
       jsonString += data;
@@ -47,20 +46,20 @@ const server = http.createServer(async (request, response) => {
       response.writeHead(201, { 'Content-Type': 'application/json' });
       response.end(JSON.stringify(newItem));
     });
-  } else if (method === 'GET' && path === '/api/items') {
+  } else if (method === 'GET' && path === '/items') { //
     const items = await db.all('SELECT * FROM items');
     response.writeHead(200, { 'Content-Type': 'application/json' });
     response.end(JSON.stringify(items));
-  } else if (method === 'PUT' && path.startsWith('/api/items/')) { 
-    const id = path.split('/')[3];
+  } else if (method === 'PUT' && path.startsWith('/items')) {  //
+    const id = path.split('/')[2];
     let jsonString = '';
     request.on('data', (data) => {
       jsonString += data;
     });
     request.on('end', async () => {
       const updatedItem = JSON.parse(jsonString);
-      const result = await db.run('UPDATE items SET name = ?, amount = ?, date = ?, level = ? WHERE id = ?', 
-                                  [updatedItem.name, updatedItem.amount, updatedItem.date, updatedItem.level, id]);
+      const result = await db.run('UPDATE items SET amount = ?', 
+                                  [ updatedItem.amount]);
       if (result.changes !== 0) {
         const updatedItemFromDb = await db.get('SELECT * FROM items WHERE id = ?', [id]);
         response.writeHead(200, { 'Content-Type': 'application/json' });
@@ -70,8 +69,8 @@ const server = http.createServer(async (request, response) => {
         response.end(JSON.stringify({ message: 'Item not found' }));
       }
     });
-  } else if (method === 'DELETE' && path.startsWith('/api/items/')) {
-    const id = path.split('/')[3];
+  } else if (method === 'DELETE' && path.startsWith('/items')) { //
+    const id = path.split('/')[2];
     const result = await db.run('DELETE FROM items WHERE id = ?', [id]);
     if (result.changes !== 0) {
       response.writeHead(200, { 'Content-Type': 'application/json' });
