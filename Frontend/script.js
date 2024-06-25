@@ -20,6 +20,13 @@ async function loadItemsFromServer() {
     console.error("Fehler beim Laden der Elemente vom Server:", error);
   }
 }
+try {
+  // Die eigentlichen Routenimplementierungen
+} catch (error) {
+  response.writeHead(500, { 'Content-Type': 'application/json' });
+  response.end(JSON.stringify({ message: 'Internal Server Error', error: error.message }));
+}
+
 
 async function addItem() {
   const newItemName = document.getElementById("newItemName").value.trim();
