@@ -1,11 +1,26 @@
+const express = require('express');
 const http = require('http');
 const url = require('url');
 const { v4: uuidv4 } = require('uuid');
 const sqlite3 = require('sqlite3').verbose();
 const sqlite = require('sqlite');
+const path = require('path');
+const fs = require('fs');
+const cors = require('cors');
+const bodyParser = require('body-parser');
 
+const app = express ();
 const hostname = '127.0.0.1'; // localhost
 const port = 3000;
+
+app.use(cors());
+app.use(bodyParser.json()); 
+app.use(express.static(path.join(__dirname, '..', 'Frontend')));
+
+const dbFile = path.join(__dirname, 'myDatabase.db')
+const dbExists = fs.existsSync(dbFile);
+console.log('Database file ${dbFile} exists: ${dbExists}');
+
 
 let db;
 
