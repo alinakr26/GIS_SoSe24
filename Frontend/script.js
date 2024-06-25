@@ -2,32 +2,43 @@ document.addEventListener("DOMContentLoaded", function () {
   loadItemsFromServer();
 });
 
+
+function isValidItem(item) {
+  return item && typeof item.id === 'string' &&
+         typeof item.name === 'string' &&
+         typeof item.amount === 'number' &&
+         typeof item.date === 'string' &&
+         typeof item.level === 'string';
+}
+
+// hier werden die daten vom Server geladen
 async function loadItemsFromServer() {
   try {
-    const response = await fetch("http://127.0.0.1:4000/items");//
+    const response = await fetch("http://127.0.0.1:3000/items");//
     if (!response.ok) {
       throw new Error(`Serverantwort nicht OK: ${response.status} ${response.statusText}`);
     }
     const items = await response.json();
     items.forEach(item => {
-      if (item && item.id && item.name && item.date && typeof item.level === 'string') {
+      if ( isValidItem) {
         addItemToPage(item);
       } else {
-        console.error(`Ungültiges Element erhalten: ${JSON.stringify(item)}`);
+        console.error(`Ungültiges Element erhalten: ${JSON.stringify(item)}`); // hier gibts den fehler aus
       }
     });
   } catch (error) {
     console.error("Fehler beim Laden der Elemente vom Server:", error);
   }
 }
+// Die eigentlichen Routenimplementierungen
 try {
-  // Die eigentlichen Routenimplementierungen
+  
 } catch (error) {
   response.writeHead(500, { 'Content-Type': 'application/json' });
   response.end(JSON.stringify({ message: 'Internal Server Error', error: error.message }));
 }
 
-
+// Hinzufügen der Items
 async function addItem() {
   const newItemName = document.getElementById("newItemName").value.trim();
   const newItemDate = document.getElementById("newItemDate").value;
@@ -46,7 +57,7 @@ async function addItem() {
   };
 
   try {
-    const response = await fetch("http://127.0.0.1:4000/items", {  //
+    const response = await fetch("http://127.0.0.1:3000/items", {  //
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -68,6 +79,8 @@ async function addItem() {
   document.getElementById("newItemName").value = "";
   document.getElementById("newItemDate").value = "";
 }
+
+// Item wird zur Seite hinzugefügt
 function addItemToPage(item) {
   if (!item || typeof item.id !== 'string' || typeof item.name !== 'string' || typeof item.amount !== 'number' || !item.date || typeof item.level !== 'string') {
     console.error(`Ungültiges Element: ${JSON.stringify(item)}`);
@@ -86,6 +99,8 @@ function addItemToPage(item) {
   countSpan.className = "count";
   countSpan.textContent = item.amount;
   countWrapper.appendChild(countSpan);
+
+  listItem.appendChild(countWrapper);
 
   const minusButton = document.createElement("button");
   minusButton.textContent = "-";
@@ -109,7 +124,7 @@ function addItemToPage(item) {
   listItem.appendChild(dateSpan);
 
   const deleteButton = document.createElement("button");
-  deleteButton.textContent = "X";
+  deleteButton.textContent = "Löschen";
   deleteButton.addEventListener("click", function () {
     deleteItem(item, listItem);
   });
@@ -121,8 +136,11 @@ function addItemToPage(item) {
   } else {
     console.error(`Container für Ebene ${item.level} nicht gefunden. Element "${item.name}" konnte nicht hinzugefügt werden.`);
   }
+  checkCountAndColor(countSpan, item.amount);
 }
 
+
+//Aktualisiert den Zähler eines Items und sendet die neue Anzahl an den Server.
 async function updateItemCount(item, countSpan, change) {
   const newCount = Math.max(0, parseInt(countSpan.textContent) + change);
   countSpan.textContent = newCount;
@@ -130,9 +148,11 @@ async function updateItemCount(item, countSpan, change) {
   checkCountAndColor(countSpan, newCount);
 }
 
+
+//Löscht ein Item vom Server und entfernt es von der Seite.
 async function deleteItem(item, listItem) {
   try {
-    const response = await fetch(`http://127.0.0.1:4000/items/${item.id}`, {//
+    const response = await fetch(`http://127.0.0.1:3000/items/${item.id}`, {//
       method: 'DELETE'
     });
 
@@ -147,9 +167,10 @@ async function deleteItem(item, listItem) {
   }
 }
 
+//Aktualisiert die Anzahl eines Items auf dem Server.
 async function updateItemOnServer(itemId, newCount) {
   try {
-    const response = await fetch(`http://127.0.0.1:4000/items/${itemId}`, { //
+    const response = await fetch(`http://127.0.0.1:3000/items/${itemId}`, { //
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
@@ -167,11 +188,13 @@ async function updateItemOnServer(itemId, newCount) {
   }
 }
 
+//Formatiert ein Datum in ein lesbares Format.
 function formatDate(dateString) {
   const date = new Date(dateString);
   return `${date.getDate().toString().padStart(2, '0')}.${(date.getMonth() + 1).toString().padStart(2, '0')}.${date.getFullYear()}`;
 }
-
+ 
+// Überprüft Anzahl und Farbe
 function checkCountAndColor(countSpan, count) {
   const itemElement = countSpan.closest(".item");
   if (count < 2) {
