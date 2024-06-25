@@ -17,7 +17,7 @@ app.use(cors());
 app.use(bodyParser.json()); 
 app.use(express.static(path.join(__dirname, '..', 'Frontend')));
 
-const dbFile = path.join(__dirname, 'myDatabase.db')
+const dbFile = path.join(__dirname, 'new.db')
 const dbExists = fs.existsSync(dbFile);
 console.log('Database file ${dbFile} exists: ${dbExists}');
 
@@ -27,7 +27,7 @@ let db;
 // Initialisiere die Datenbank
 async function initDb() {
   db = await sqlite.open({
-    filename: 'myDatabase.db',
+    filename: 'new.db',
     driver: sqlite3.Database,
   });
   await db.run('CREATE TABLE IF NOT EXISTS items (id TEXT PRIMARY KEY, name TEXT, amount INT, date TEXT, level TEXT)');
@@ -129,7 +129,7 @@ const server = http.createServer(async (request, response) => {
 });
 
 initDb().then(() => {
-  server.listen(port, hostname, () => {
+  app.listen(port, hostname, () => {
     console.log(`Server running at http://${hostname}:${port}/`);
   });
 }).catch((error) => {
