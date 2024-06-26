@@ -16,12 +16,7 @@ const port = 3000;
 app.use(cors());
 app.use(bodyParser.json()); 
 app.use(express.static(path.join(__dirname, '..', 'Frontend')));
-app.get('/items', (req, res) => {
-  res.json(items);
-});
-app.listen(port, () => {
-  console.log(`Server läuft auf http://127.0.0.1:${port}`);
-});
+
 
 const dbFile = path.join(__dirname, 'new.db')
 const dbExists = fs.existsSync(dbFile);
@@ -38,6 +33,7 @@ async function initDb() {
   });
   await db.run('CREATE TABLE IF NOT EXISTS items (id TEXT PRIMARY KEY, name TEXT, amount INT, date TEXT, level TEXT)');
 }
+
 
 // Validierungsfunktion
 function validateItem(item) {
