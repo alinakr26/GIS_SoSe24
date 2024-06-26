@@ -9,6 +9,7 @@ function isValidItem(item) {
          typeof item.amount === 'number' &&
          typeof item.date === 'string' &&
          typeof item.level === 'string';
+         (consol.log("funktion isValidItem"))
 }
 
 // hier werden die daten vom Server geladen
@@ -16,18 +17,18 @@ async function loadItemsFromServer() {
   try {
     const response = await fetch("http://127.0.0.1:3000/items");//
     if (!response.ok) {
-      throw new Error(`Serverantwort nicht OK: ${response.status} ${response.statusText}`);
+      throw new Error(`Serverantwort nicht OK: ${response.status} ${response.statusText}`);// hier gibts die Fehlermeldung 
     }
     const items = await response.json();
     items.forEach(item => {
-      if ( isValidItem) {
+      if (isValidItem(item)) {
         addItemToPage(item);
       } else {
-        console.error(`Ungültiges Element erhalten: ${JSON.stringify(item)}`); // hier gibts den fehler aus
+        console.error(`Ungültiges Element erhalten: ${JSON.stringify(item)}`); 
       }
     });
   } catch (error) {
-    console.error("Fehler beim Laden der Elemente vom Server:", error);
+    console.error("Fehler beim Laden der Elemente vom Server:", error); 
   }
 }
 // Die eigentlichen Routenimplementierungen
@@ -70,7 +71,7 @@ async function addItem() {
       addItemToPage(savedItem);
       console.log(`Lebensmittel "${savedItem.name}" erfolgreich hinzugefügt`);
     } else {
-      console.error(`Fehler beim Hinzufügen des Lebensmittels: ${response.statusText}`);
+      console.error(`Fehler beim Hinzufügen des Lebensmittels: ${response.statusText}`); // hier gibts die Fehlermeldung 
     }
   } catch (error) {
     console.error("Fehler beim Hinzufügen des Lebensmittels:", error);
