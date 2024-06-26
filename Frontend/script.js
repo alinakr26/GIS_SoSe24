@@ -17,7 +17,7 @@ async function loadItemsFromServer() {
   try {
     const response = await fetch("http://127.0.0.1:3000/items");//
     if (!response.ok) {
-      throw new Error(`Serverantwort nicht OK: ${response.status} ${response.statusText}`);// hier gibts die Fehlermeldung 
+      throw new Error(`Serverantwort nicht OK: ${response.status} ${response.statusText}`);
     }
     const items = await response.json();
     items.forEach(item => {

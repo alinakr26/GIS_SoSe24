@@ -1,4 +1,4 @@
-const express = require('express');
+//const express = require('express');
 const http = require('http');
 const url = require('url');
 const { v4: uuidv4 } = require('uuid');
@@ -9,13 +9,12 @@ const fs = require('fs');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 
-const app = express ();
+//const app = express ();
 const hostname = '127.0.0.1'; // localhost
 const port = 3000;
 
-app.use(cors());
-app.use(bodyParser.json()); 
-app.use(express.static(path.join(__dirname, '..', 'Frontend')));
+//app.use(bodyParser.json()); 
+//app.use(express.static(path.join(__dirname, '..', 'Frontend')));
 
 
 const dbFile = path.join(__dirname, 'new.db')
@@ -131,7 +130,7 @@ const server = http.createServer(async (request, response) => {
 });
 
 initDb().then(() => {
-  app.listen(port, hostname, () => {
+  server.listen(port, hostname, () => {
     console.log(`Server running at http://${hostname}:${port}/`);
   });
 }).catch((error) => {
